@@ -1,0 +1,4 @@
+{
+    "typescript.tsdk": "voca-frontend/node_modules/typescript/lib",
+    "eslint.nodePath": "voca-frontend/node_modules"
+}
