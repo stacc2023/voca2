@@ -35,3 +35,12 @@ Done
 
 Todo
 1. Reset functionality.
+2. Add a feature that automatically creates an 'mp3' folder. Look for ways to make production easier.
+3. Reset toggle value when flipping the flashcard.
+4. hover to active.
+
+2024-07-25 07:14
+
+Done
+1. Hover to active.
+2. Modify the toggle method.

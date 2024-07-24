@@ -10,7 +10,7 @@ function Card({ row }) {
     if (toggle == false && row[0] == 'TRUE') {
         className += ' checked';
     } else if (toggle == true && row[3] == 'TRUE') {
-        className += ' checked'
+        className += ' checked';
     }
 
     const handleKeyDown = e => {
@@ -26,7 +26,7 @@ function Card({ row }) {
         return () => {
             window.removeEventListener('keydown', handleKeyDown);
         }
-    }, [])
+    }, []);
 
     return (
         <div className={className} onClick={e => {
@@ -83,7 +83,11 @@ export default function CardFrame() {
     let className = 'card-frame';
 
     const handleClickFilter = () => {
-        setWords(words.filter(row => row[0] == 'FALSE'));
+        const filteredWords = words.filter(row => row[0] == 'FALSE' || row == words[wordIndex]);
+        const newWordIndex = filteredWords.indexOf(words[wordIndex]);
+
+        setWords(filteredWords);
+        setWordIndex(newWordIndex);
     }
 
     const handleClickCheck = async (type) => {
@@ -126,6 +130,18 @@ export default function CardFrame() {
         const res = await axios.post('/speak', { text }, { responseType: 'blob' });
         const url = window.URL.createObjectURL(new Blob([res.data], { type: 'audio/mp3' }));
         setAudioUrl(url);
+    }
+
+    const handleClickIndex = () => {
+        const userInput = prompt('Go to');
+        const number = parseFloat(userInput);
+        if (isNaN(number)) {
+            alert('invalid format');
+        }
+        if (1 > number || words.length < number) {
+            alert('invalid range');
+        }
+        setWordIndex(number - 1);
     }
 
 
@@ -171,11 +187,11 @@ export default function CardFrame() {
             </div>
             <div className={className}>
                 <header>
-                    <div> {wordIndex + 1} / {words.length} </div>
+                    <div onClick={handleClickIndex}> {wordIndex + 1} / {words.length} </div>
                 </header>
                 <main>
                     <Check type={'p'} onClick={() => handleClickCheck('p')} />
-                    <Card row={words[wordIndex]} />
+                    <Card key={words[wordIndex][1]} row={words[wordIndex]} />
                     <Check type={'n'} onClick={() => handleClickCheck('n')} />
                 </main>
                 <footer>

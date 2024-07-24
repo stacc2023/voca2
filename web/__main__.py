@@ -2,9 +2,14 @@ from flask import Flask, request, jsonify, send_file
 from sheet import get_sheets, get_sheet
 from tts import tts
 
+# In dev.
 app = Flask(__name__)
-# in production
+# In production
 # app = Flask(__name__, static_folder='../client/build/static', template_folder='../client/build')
+# @app.route('/')
+# def index():
+#     return send_from_directory(app.template_folder, 'index.html')
+
 
 # when the home page loaded, first get the list of name of sheets
 @app.route('/sheets')
@@ -45,6 +50,7 @@ def speak():
 
 
 if __name__ == '__main__':
+    # In Dev.
     app.run(debug=True)
-    # in production
+    # In production
     # app.run(port=3001, host='0.0.0.0')
