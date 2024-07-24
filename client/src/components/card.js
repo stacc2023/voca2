@@ -1,5 +1,6 @@
-import { useContext, useEffect, useState } from "react"
+import { useContext, useEffect, useRef, useState } from "react"
 import { AppContext } from "../context";
+import axios from 'axios';
 
 function Card({ row }) {
     // row[0] : word toggle, row[1] : word, row[2] : meaning, row[3] : meaning toggle
@@ -76,8 +77,14 @@ function Check({ type, onClick }) {
 
 export default function CardFrame() {
     const { sheet, words, setWords, rawWords, setRawWords, wordIndex, setWordIndex, setSheet } = useContext(AppContext);
+    const [ audioUrl, setAudioUrl ] = useState(null);
+    const audioRef = useRef(null);
 
     let className = 'card-frame';
+
+    const handleClickFilter = () => {
+        setWords(words.filter(row => row[0] == 'FALSE'));
+    }
 
     const handleClickCheck = async (type) => {
         if (type == 'l') {
@@ -97,8 +104,6 @@ export default function CardFrame() {
 
             const rawIndex = rawWords.indexOf(words[wordIndex]) + 1;
 
-            console.log(wordIndex);
-
             const res = await fetch('/check', {
                 method: 'POST',
                 headers: {
@@ -113,11 +118,19 @@ export default function CardFrame() {
             });
     
             const data = await res.json();
-            console.log(data);
         }
     }
 
+    const speak = async () => {
+        const text = words[wordIndex][1];
+        const res = await axios.post('/speak', { text }, { responseType: 'blob' });
+        const url = window.URL.createObjectURL(new Blob([res.data], { type: 'audio/mp3' }));
+        setAudioUrl(url);
+    }
+
+
     useEffect(() => {
+        speak();
         const handleKeyDown = e => {
             switch (e.key) {
                 case 'ArrowLeft':
@@ -140,13 +153,20 @@ export default function CardFrame() {
             console.log('the cardframe useefeect is returned')
             window.removeEventListener('keydown', handleKeyDown);
         }
-    }, [wordIndex])
+    }, [wordIndex]);
+
+    useEffect(() => {
+        if (audioUrl && audioRef.current) {
+            audioRef.current.play();
+        }
+    }, [audioUrl]);
 
     return (
         <div className="modal">
+            { audioUrl ? <audio ref={audioRef} src={audioUrl} style={{ display: 'none' }} /> : null }
             <div className='upper'>
                 <button>reset</button>
-                <button>remove checked</button>
+                <button onClick={handleClickFilter}>filter</button>
                 <Exit setWordIndex={setWordIndex} setRawWords={setRawWords} setWords={setWords} setSheet={setSheet}/>
             </div>
             <div className={className}>

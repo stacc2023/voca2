@@ -1,7 +1,10 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_file
 from sheet import get_sheets, get_sheet
+from tts import tts
 
-app =Flask(__name__)
+app = Flask(__name__)
+# in production
+# app = Flask(__name__, static_folder='../client/build/static', template_folder='../client/build')
 
 # when the home page loaded, first get the list of name of sheets
 @app.route('/sheets')
@@ -28,5 +31,20 @@ def check():
     
     return jsonify({'message': 'Value received', 'value': value})
 
+@app.route('/speak', methods=['POST'])
+def speak():
+    data = request.json
+    text = data.get('text', '')
+
+    if not text:
+        return jsonify({'error': 'No text provided'}), 400
+    
+    file_path = tts(text)
+
+    return send_file(file_path, as_attachment=True)
+
+
 if __name__ == '__main__':
     app.run(debug=True)
+    # in production
+    # app.run(port=3001, host='0.0.0.0')

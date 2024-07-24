@@ -162,3 +162,5 @@ cython_debug/
 #.idea/
 
 sheet_cred.json
+tts_cred.json
+mp3/
